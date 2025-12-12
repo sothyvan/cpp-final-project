@@ -19,7 +19,6 @@ int main() {
         cout << "1. Display Delivery Network\n";
         cout << "2. Optimize Single Route\n";
         cout << "3. Plan Multi-Stop Delivery\n";
-        cout << "4. Demo All Features\n";
         cout << "0. Exit\n";
         cout << "Enter your choice: ";
         cin >> choice;
@@ -60,23 +59,6 @@ int main() {
                 }
                 
                 optimizer.planMultiStopDelivery(depot, stops);
-                break;
-            }
-            
-            case 4: {
-                cout << "\n===== DEMO: OPTIMIZING DELIVERY ROUTES =====\n";
-                
-                // Demo 1: Display network
-                optimizer.displayNetwork();
-                
-                // Demo 2: Single route optimization
-                cout << "\n\n===== DEMO 1: SINGLE ROUTE OPTIMIZATION =====\n";
-                optimizer.optimizeRoute("Warehouse", "Hospital");
-                
-                // Demo 3: Multi-stop delivery
-                cout << "\n\n===== DEMO 2: MULTI-STOP DELIVERY =====\n";
-                vector<string> deliveryStops = {"University", "Shopping Mall", "Airport"};
-                optimizer.planMultiStopDelivery("Warehouse", deliveryStops);
                 break;
             }
             

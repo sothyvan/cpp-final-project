@@ -118,13 +118,8 @@ public:
             currentLocation = nearestStop;
         }
         
-        // Return to depot
-        vector<int> pathToDepot = deliveryNetwork.findShortestPath(currentLocation, depot);
-        totalDistance += deliveryNetwork.getPathDistance(pathToDepot);
-        route.push_back(depot);
-        
         // Display the route
-        cout << "OPTIMIZED DELIVERY ROUTE (Nearest Neighbor):\n";
+        cout << "OPTIMIZED DELIVERY ROUTE:\n";
         for (size_t i = 0; i < route.size(); i++) {
             cout << route[i];
             if (i != route.size() - 1) {
