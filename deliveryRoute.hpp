@@ -1,8 +1,6 @@
 #ifndef deliveryRoute_hpp
 #define deliveryRoute_hpp
 
-#include <iomanip>
-
 #include "graph.hpp"
 
 using namespace std;
@@ -74,9 +72,9 @@ public:
     }
     
     // Plan delivery for multiple stops (TSP approximation - nearest neighbor)
-    void planMultiStopDelivery(const string& depot, const vector<string>& stops) {
+    void planMultiStopDelivery(const string& pickUp, const vector<string>& stops) {
         cout << "\n========== MULTI-STOP DELIVERY PLAN ==========\n";
-        cout << "Depot: " << depot << "\n";
+        cout << "Pick-Up: " << pickUp << "\n";
         cout << "Stops: ";
         for (const string& stop : stops) {
             cout << stop << " ";
@@ -84,16 +82,19 @@ public:
         cout << "\n\n";
         
         vector<string> remainingStops = stops;
-        vector<string> route;
-        string currentLocation = depot;
+        vector<vector<int>> fullRoutePaths;  // Store full paths between stops
+        vector<string> stopSequence;        // Store the sequence of stops
+        string currentLocation = pickUp;
         double totalDistance = 0;
         
-        route.push_back(currentLocation);
+        stopSequence.push_back(currentLocation);
         
         while (!remainingStops.empty()) {
             string nearestStop;
             double minDistance = numeric_limits<double>::max();
+            vector<int> bestPath;
             
+            // Find the nearest stop
             for (const string& stop : remainingStops) {
                 vector<int> path = deliveryNetwork.findShortestPath(currentLocation, stop);
                 double distance = deliveryNetwork.getPathDistance(path);
@@ -101,11 +102,17 @@ public:
                 if (distance < minDistance) {
                     minDistance = distance;
                     nearestStop = stop;
+                    bestPath = path;
                 }
             }
             
-            // Add nearest stop to route
-            route.push_back(nearestStop);
+            // Store the path to the nearest stop
+            if (!bestPath.empty()) {
+                fullRoutePaths.push_back(bestPath);
+            }
+            
+            // Add nearest stop to sequence
+            stopSequence.push_back(nearestStop);
             totalDistance += minDistance;
             
             // Remove from remaining stops
@@ -117,15 +124,27 @@ public:
             currentLocation = nearestStop;
         }
         
-        // Display the route
+        // Display the full optimized route with all paths
         cout << "OPTIMIZED DELIVERY ROUTE:\n";
-        for (size_t i = 0; i < route.size(); i++) {
-            cout << route[i];
-            if (i != route.size() - 1) {
-                cout << " -> ";
+        
+        // Display each segment of the route
+        for (size_t i = 0; i < fullRoutePaths.size(); i++) {
+            cout << "\nSegment " << (i+1) << " (" << stopSequence[i] << " to " << stopSequence[i+1] << "):\n";
+            
+            // Display the path for this segment
+            vector<int> path = fullRoutePaths[i];
+            for (size_t j = 0; j < path.size(); j++) {
+                cout << deliveryNetwork.getLocationName(path[j]);
+                if (j != path.size() - 1) {
+                    cout << " -> ";
+                }
             }
+            
+            double segmentDistance = deliveryNetwork.getPathDistance(path);
+            cout << "\nDistance: " << fixed << setprecision(1) << segmentDistance << " km\n";
         }
-        cout << "\nTotal Route Distance: " << fixed << setprecision(1) << totalDistance << " km\n";
+        
+        cout << "\nTOTAL ROUTE DISTANCE: " << fixed << setprecision(1) << totalDistance << " km\n";
     }
 };
 

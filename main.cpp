@@ -41,11 +41,11 @@ int main() {
             }
             
             case 3: {
-                string depot;
+                string pickUp;
                 int numStops;
-                cout << "Enter depot location: ";
+                cout << "Enter pick-up location: ";
                 cin.ignore();
-                getline(cin, depot);
+                getline(cin, pickUp);
                 cout << "Enter number of delivery stops: ";
                 cin >> numStops;
                 
@@ -58,7 +58,7 @@ int main() {
                     stops.push_back(stop);
                 }
                 
-                optimizer.planMultiStopDelivery(depot, stops);
+                optimizer.planMultiStopDelivery(pickUp, stops);
                 break;
             }
             

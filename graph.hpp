@@ -197,7 +197,7 @@ public:
             int displayCount = min((int)alternativePathsWithDistance.size(), maxRoutes);
             
             for (int i = 0; i < displayCount; i++) {
-                cout << "Alternative Route " << (i+1) << " (" << (i+2) << "nd shortest): ";
+                cout << "Alternative Route " << (i+1) << ": ";
                 displayPath(alternativePathsWithDistance[i].first);
                 cout << "Total distance: " << fixed << setprecision(1) << alternativePathsWithDistance[i].second << " km\n\n";
             }
