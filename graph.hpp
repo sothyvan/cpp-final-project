@@ -9,6 +9,7 @@
 #include <string>
 #include <algorithm>
 #include <limits>
+#include <iomanip>
 
 using namespace std;
 
@@ -158,8 +159,8 @@ public:
     }
     
     // ==================== DFS FOR ALTERNATIVE ROUTES ====================
-    
-    void findAllRoutes(const string& start, const string& end, int maxRoutes = 5) {
+
+    void findAllRoutes(const string& start, const string& end, const vector<int>& shortestPath, int maxRoutes = 5) {
         int startIndex = getLocationIndex(start);
         int endIndex = getLocationIndex(end);
         
@@ -167,20 +168,49 @@ public:
         vector<int> currentPath;
         unordered_set<int> visited;
         
-        dfsFindAllPaths(startIndex, endIndex, visited, currentPath, allPaths, maxRoutes);
+        // Find ALL possible paths (or a reasonable number)
+        // Increase limit to ensure we find enough alternatives
+        int pathLimit = 20;  // Find up to 20 paths total
+        dfsFindAllPaths(startIndex, endIndex, visited, currentPath, allPaths, pathLimit);
         
-        cout << "\n========== ALTERNATIVE ROUTES ==========\n";
-        for (size_t i = 0; i < allPaths.size(); i++) {
-            cout << "Route " << (i+1) << ": ";
-            displayPath(allPaths[i]);
-            cout << "Total distance: " << getPathDistance(allPaths[i]) << " km\n\n";
+        // Filter out the shortest path and create pairs of (path, distance)
+        vector<pair<vector<int>, double>> alternativePathsWithDistance;
+        for (const auto& path : allPaths) {
+            if (path != shortestPath) {
+                double distance = getPathDistance(path);
+                alternativePathsWithDistance.push_back({path, distance});
+            }
+        }
+        
+        // Sort all alternative paths by distance (shortest to longest)
+        sort(alternativePathsWithDistance.begin(), alternativePathsWithDistance.end(),
+            [](const pair<vector<int>, double>& a, const pair<vector<int>, double>& b) {
+                return a.second < b.second;
+            });
+        
+        cout << "\n========== ALTERNATIVE ROUTES (SHORTEST TO LONGEST) ==========\n";
+        
+        if (alternativePathsWithDistance.empty()) {
+            cout << "No alternative routes found.\n";
+        } else {
+            // Take the top maxRoutes alternatives (shortest ones)
+            int displayCount = min((int)alternativePathsWithDistance.size(), maxRoutes);
+            
+            for (int i = 0; i < displayCount; i++) {
+                cout << "Alternative Route " << (i+1) << " (" << (i+2) << "nd shortest): ";
+                displayPath(alternativePathsWithDistance[i].first);
+                cout << "Total distance: " << fixed << setprecision(1) << alternativePathsWithDistance[i].second << " km\n\n";
+            }
         }
     }
-    
+
 private:
     void dfsFindAllPaths(int current, int end, unordered_set<int>& visited, 
-                        vector<int>& currentPath, vector<vector<int>>& allPaths, int maxRoutes) {
-        if (allPaths.size() >= maxRoutes) return;
+                        vector<int>& currentPath, vector<vector<int>>& allPaths, int maxPaths) {
+        // To avoid infinite loops in cyclic graphs, limit path length
+        if (currentPath.size() > 10) {  // Don't explore paths longer than 10 nodes
+            return;
+        }
         
         visited.insert(current);
         currentPath.push_back(current);
@@ -189,8 +219,8 @@ private:
             allPaths.push_back(currentPath);
         } else {
             for (const Edge& edge : adjacencyList[current]) {
-                if (visited.find(edge.destination) == visited.end()) {
-                    dfsFindAllPaths(edge.destination, end, visited, currentPath, allPaths, maxRoutes);
+                if (visited.find(edge.destination) == visited.end() && allPaths.size() < maxPaths) {
+                    dfsFindAllPaths(edge.destination, end, visited, currentPath, allPaths, maxPaths);
                 }
             }
         }

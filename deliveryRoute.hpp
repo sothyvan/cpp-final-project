@@ -63,10 +63,9 @@ public:
         
         double totalDistance = deliveryNetwork.getPathDistance(shortestPath);
         cout << "\nTotal Distance: " << fixed << setprecision(1) << totalDistance << " km\n";
-        cout << "Estimated Delivery Time: " << fixed << setprecision(0) << (totalDistance * 2.5) << " minutes\n";
         
-        // Show alternative routes
-        deliveryNetwork.findAllRoutes(start, end, 3);
+        // Show alternative routes (excluding the optimal one)
+        deliveryNetwork.findAllRoutes(start, end, shortestPath, 3);
     }
     
     // Display the entire delivery network
@@ -127,7 +126,6 @@ public:
             }
         }
         cout << "\nTotal Route Distance: " << fixed << setprecision(1) << totalDistance << " km\n";
-        cout << "Estimated Total Time: " << fixed << setprecision(0) << (totalDistance * 2.5) << " minutes\n";
     }
 };
 
